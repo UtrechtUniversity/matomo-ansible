@@ -1,0 +1,72 @@
+---
+services:
+  database:
+    image: mariadb:12
+    command: --max-allowed-packet=64MB
+    restart: always
+    volumes:
+      - database:/var/lib/mysql:Z
+    environment:
+      - MARIADB_AUTO_UPGRADE=1
+      - MARIADB_DATABASE=matomo
+      - MARIADB_DISABLE_UPGRADE_BACKUP=1
+      - MARIADB_INITDB_SKIP_TZINFO=1
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_USER=matomo
+
+  matomo:
+    image: matomo:5.4.0
+    restart: always
+    depends_on:
+      - database
+    volumes:
+      - matomo:/var/www/html:z
+    environment:
+      - MATOMO_DATABASE_ADAPTER=mysql
+      - MATOMO_DATABASE_DBNAME=matomo
+      - MATOMO_DATABASE_HOST=database
+      - MATOMO_DATABASE_PASSWORD=${MARIADB_PASSWORD}
+      - MATOMO_DATABASE_TABLES_PREFIX=matomo_
+      - MATOMO_DATABASE_USERNAME=matomo
+      - PHP_MEMORY_LIMIT=2048M
+
+  nginx:
+    container_name: nginx
+    image: ghcr.io/utrechtuniversity/matomo-nginx:latest
+    depends_on:
+      - matomo
+      - mta
+    environment:
+      - MATOMO_HOST=${MATOMO_HOST}
+      - MATOMO_HOST_PORT=${MATOMO_HOST_PORT}
+      - MTA_ROLE=${MTA_ROLE}
+    ports:
+      - "${MATOMO_HOST_IP}:${MATOMO_HOST_PORT}:443"
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
+    volumes:
+      - nginx_config:/etc/nginx/conf.d
+      - ./import-certificates:/etc/import-certificates
+
+  mta:
+    container_name: mta
+    image: ghcr.io/utrechtuniversity/matomo-mta:latest
+    environment:
+      -  MTA_ROLE=${MTA_ROLE}
+      -  POSTFIX_RELAYHOST_FQDN=${POSTFIX_RELAYHOST_FQDN}
+      -  POSTFIX_RELAYHOST_PORT=${POSTFIX_RELAYHOST_PORT}
+      -  POSTFIX_RELAYHOST_USERNAME=${POSTFIX_RELAYHOST_USERNAME}
+      -  POSTFIX_RELAYHOST_PASSWORD=${POSTFIX_RELAYHOST_PASSWORD}
+      -  POSTFIX_RELAYHOST_AUTH_ENABLED=${POSTFIX_RELAYHOST_AUTH_ENABLED}
+      -  POSTFIX_RELAYHOST_TLS_ENABLED=${POSTFIX_RELAYHOST_TLS_ENABLED}
+      -  POSTFIX_MYHOSTNAME=${POSTFIX_MYHOSTNAME}
+      -  POSTFIX_ORIGIN=${POSTFIX_ORIGIN}
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
+
+
+volumes:
+  database:
+  matomo:
+  nginx_config:
