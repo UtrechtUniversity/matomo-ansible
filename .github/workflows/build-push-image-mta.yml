@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/build-push-image-mta.yml'
       - 'docker/images/mta/**'
+  workflow_dispatch:
 
 jobs:
   push-image:

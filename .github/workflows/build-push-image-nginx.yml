@@ -8,6 +8,7 @@ on:
     paths:
       - '.github/workflows/build-push-image-nginx.yml'
       - 'docker/images/nginx/**'
+  workflow_dispatch:
 
 jobs:
   push-image:
