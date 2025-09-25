@@ -1,0 +1,13 @@
+---
+# copyright Utrecht University
+
+- name: Restart firewall
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
+
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted

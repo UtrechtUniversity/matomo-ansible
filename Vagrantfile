@@ -7,7 +7,7 @@
 VAGRANT_DEFAULT_PROVIDER= "libvirt"
 VAGRANTFILE_API_VERSION = "2"
 
-BOX = 'almalinux/10'
+BOX = 'almalinux/9'
 GUI = false
 CPU = 2
 RAM = 2048

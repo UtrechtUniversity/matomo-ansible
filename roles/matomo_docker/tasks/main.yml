@@ -1,0 +1,85 @@
+---
+# copyright Utrecht University
+
+- name: Ensure group for Matomo docker setup exists
+  ansible.builtin.group:
+    name: "{{ matomo_user }}"
+
+
+- name: Ensure user for Matomo docker setup exists
+  ansible.builtin.user:
+    name: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    groups: docker
+    create_home: true
+
+
+- name: Check out Matomo repo with Docker Compose setup
+  become_user: "{{ matomo_user }}"
+  become: true
+  ansible.builtin.git:
+    repo: "https://github.com/UtrechtUniversity/matomo-ansible.git"
+    dest: "/home/{{ matomo_user }}/matomo-ansible"
+    version: "{{ matomo_branch }}"
+    force: true
+
+
+- name: Check that cert_mode is set to valid mode
+  ansible.builtin.fail:
+    msg: "cert_mode should be set to either selfsigned or static"
+  when: matomo_cert_mode not in ["selfsigned", "static"]
+
+
+- name: Upload static certificate
+  ansible.builtin.copy:
+    dest: "/home/{{ matomo_user }}/matomo-ansible/docker/import-certificates/matomo.pem"
+    content: '{{ matomo_static_cert }}'
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: '0644'
+  when: matomo_cert_mode == "static"
+
+
+- name: Upload static certificate key
+  ansible.builtin.copy:
+    dest: "/home/{{ matomo_user }}/matomo-ansible/docker/import-certificates/matomo.key"
+    content: '{{ matomo_static_cert_key }}'
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: '0644'
+  when: matomo_cert_mode == "static"
+
+
+- name: Install configuration Docker Compose setup
+  ansible.builtin.template:
+    src: env.j2
+    dest: "/home/{{ matomo_user }}/matomo-ansible/docker/.env"
+    owner: '{{ matomo_user }}'
+    group: '{{ matomo_user }}'
+    mode: '0644'
+
+
+- name: Open TCP port for Matomo
+  ansible.posix.firewalld:
+    port: "{{ matomo_host_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  become: true
+
+
+- name: Create Matomo systemd unit file
+  ansible.builtin.template:
+    src: matomo.service.j2
+    dest: /etc/systemd/system/matomo.service
+    owner: root
+    group: root
+    mode: '0644'
+
+
+- name: Enable and start Matomo service
+  ansible.builtin.service:
+    name: matomo
+    enabled: true
+    state: started
+    daemon_reload: true

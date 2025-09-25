@@ -8,6 +8,13 @@ Ansible playbook and Docker Compose setup for Matomo web statistics
 * [Docker Compose](https://docs.docker.com/compose/)
 * The images have been developed for the amd64 architecture
 
+### Requirements for deploying to server
+
+* [Ansible](https://docs.ansible.com/ansible/intro_installation.html) (>= 2.9)
+* [Vagrant](https://www.vagrantup.com/docs/installation/) (2.x - only for local VM)
+* Enterprise Linux 9 (e.g. AlmaLinux or RHEL)
+* The images have been developed for the amd64 architecture
+
 # Local development in containers (Docker)
 
 If you use Windows, ensure that core.autocrlf is set to false in your git client before you clone the matomo-ansible
@@ -50,8 +57,31 @@ self-signed certificates, so you'll need to accept the security warning in your 
 
 Run the setup wizard to configure Matomo
 
+### Local development VM
+
+First create the VMs using Vagrant:
+
+```bash
+vagrant up
+```
+
+On a Windows host, first SSH into the Ansible controller virtual machine (skip this step on GNU/Linux or macOS):
+```bash
+vagrant ssh matomo-controller
+cd ~/matomo-ansible
+```
+
+Deploy Matomo to the development virtual machine:
+```bash
+ansible-playbook playbook.yml
+```
+
+Add the following host to /etc/hosts (GNU/Linux or macOS) or %SystemRoot%\System32\drivers\etc\hosts (Windows):
+```
+192.168.60.10 dev.matomo.test
+```
+
 ## License
 
 This project is licensed under the MIT license.
 The full license can be found in [LICENSE](LICENSE).
-

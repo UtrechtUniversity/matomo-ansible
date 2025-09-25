@@ -1,0 +1,30 @@
+---
+# copyright Utrecht University
+
+matomo_user: matomo
+matomo_branch: main
+
+matomo_host_name: dev.matomo.test
+matomo_host_ip: 192.168.60.10
+matomo_host_port: 443
+
+matomo_mysql_password: testtest
+matomo_mysql_root_password: testtest
+
+# MTA role can be either "mailpit" or "postfix"
+matomo_mta_role: mailpit
+
+matomo_postfix_relayhost_fqdn: notspecified
+matomo_postfix_relayhost_port: 25
+matomo_postfix_relayhost_username: changeme
+matomo_postfix_relayhost_password: changeme
+matomo_postfix_relayhost_auth_enabled: "yes"
+matomo_postfix_relayhost_tls_enabled: "yes"
+matomo_postfix_myhostname: changeme
+matomo_postfix_origin: changeme
+matomo_mail_from_address: matomo@changeme.nl
+
+# Cert mode can be static or self-signed
+matomo_cert_mode: selfsigned
+matomo_static_cert: notset
+matomo_static_cert_key: notset

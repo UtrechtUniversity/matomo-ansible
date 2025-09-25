@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Matomo service
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+User={{ matomo_user }}
+Group= {{ matomo_user }}
+WorkingDirectory=/home/{{ matomo_user }}/matomo-ansible/docker
+ExecStart=/usr/bin/docker compose up --no-color --no-recreate
+ExecStop=/usr/bin/docker compose down
+TimeoutStartSec=0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

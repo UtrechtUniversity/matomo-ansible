@@ -1,0 +1,14 @@
+---
+# copyright Utrecht University
+
+# Temporary directory to store downloaded files.
+zabbix_agent_package_dir: /tmp
+
+zabbix_server: 192.168.2.22
+zabbix_timeout: 15               # in seconds (range: 1-30)
+
+repo_only: false
+
+# This forces Zabbix to install from a Zabbix RPM package rather
+# than from a local repository.
+zabbix_force_install_from_rpm: true

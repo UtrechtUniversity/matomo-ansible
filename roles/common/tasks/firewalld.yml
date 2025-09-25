@@ -1,0 +1,15 @@
+---
+# copyright Utrecht University
+
+- name: Ensure firewall is installed
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+  notify: Restart firewall
+
+
+- name: Ensure firewall is running and enabled
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true

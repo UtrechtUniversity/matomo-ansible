@@ -1,0 +1,94 @@
+---
+# copyright Utrecht University
+
+- name: Include distribution version specific variables for Zabbix (EL)
+  ansible.builtin.include_vars: "rh9.yml"
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Include distribution version specific variables for Zabbix (Ubuntu)
+  ansible.builtin.include_vars: "ubuntu.yml"
+  when: ansible_os_family == 'Debian'
+
+
+- name: Remove old zabbix_agentd.userparams.conf from zabbix_agentd.d
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_agentd.d/zabbix_agentd.userparams.conf
+    state: absent
+
+
+- name: Install Zabbix package for Debian family
+  ansible.builtin.include_tasks: install-debian.yml
+  when: ansible_os_family == 'Debian'
+
+
+- name: Install Zabbix package for RedHat family
+  ansible.builtin.include_tasks: install-redhat.yml
+  when: ansible_os_family == 'RedHat'
+
+
+- name: Enable the Zabbix agent service
+  ansible.builtin.service:
+    name: zabbix-agent
+    enabled: true
+    use: service
+
+
+- name: Allow Zabbix agent to start
+  community.general.selinux_permissive:
+    name: zabbix_agent_t
+    permissive: true
+  when: ansible_os_family == 'RedHat' and ansible_selinux.status == "enabled"
+
+
+- name: Allow Zabbix agent to sudo
+  ansible.posix.seboolean:
+    name: zabbix_run_sudo
+    state: true
+    persistent: true
+  when: ansible_os_family == 'RedHat' and ansible_selinux.status == "enabled"
+
+
+- name: Generate Zabbix agent PSK
+  ansible.builtin.shell:
+    cmd: openssl rand -hex 256 > /etc/zabbix/zabbix_agentd.psk
+    creates: etc/zabbix/zabbix_agentd.psk
+  when: not ansible_check_mode
+
+
+- name: Ensure right file ownership on zabbix_agentd.psk
+  ansible.builtin.file:
+    path: /etc/zabbix/zabbix_agentd.psk
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+
+
+- name: Configure Zabbix agent
+  ansible.builtin.template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+  notify: Restart Zabbix agent
+
+
+- name: Configure Zabbix AppArmor profile
+  ansible.builtin.template:
+    src: usr.sbin.zabbix_agentd.j2
+    dest: /etc/apparmor.d/usr.sbin.zabbix_agentd
+    owner: root
+    group: root
+    mode: '0644'
+  register: zabbix_apparmor
+  when: ansible_os_family == 'Debian'
+
+
+- name: Put Zabbix agent in AppArmor complain mode
+  ansible.builtin.shell: |
+    aa-complain /usr/sbin/zabbix_agentd
+    apparmor_parser -r /etc/apparmor.d/usr.sbin.zabbix_agentd
+  notify: Restart Zabbix agent
+  changed_when: true
+  when: ansible_os_family == 'Debian' and zabbix_apparmor.changed
