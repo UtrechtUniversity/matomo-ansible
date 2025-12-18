@@ -1,0 +1,46 @@
+---
+name: "Build Nginx image and push it to registry"
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/build-push-image-matomo.yml'
+      - 'docker/images/matomo/**'
+  workflow_dispatch:
+
+jobs:
+  push-image:
+    if: github.repository == 'utrechtuniversity/matomo-ansible'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+
+    - name: Check out Matomo Ansible repository
+      uses: actions/checkout@v6
+      with:
+        path: matomo-ansible
+        repository: UtrechtUniversity/matomo-ansible
+        ref: ${{ steps.extract_branch.outputs.branch }}
+
+    - name: Authenticate to the container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: matomo-ansible/docker/images/matomo
+        file: matomo-ansible/docker/images/matomo/Dockerfile
+        push: true
+        tags: ghcr.io/utrechtuniversity/matomo-app:latest

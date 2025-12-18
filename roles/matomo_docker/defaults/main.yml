@@ -8,6 +8,12 @@ matomo_host_name: dev.matomo.test
 matomo_host_ip: 192.168.60.10
 matomo_host_port: 443
 
+matomo_first_site_name: test
+matomo_first_site_url: https://yoda.uu.nl
+matomo_first_user_name: admin
+matomo_first_user_email: yoda@uu.nl
+matomo_first_user_password: test
+
 matomo_mysql_password: testtest
 matomo_mysql_root_password: testtest
 

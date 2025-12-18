@@ -12,8 +12,9 @@ server {
 
 server {
 
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
 
     ssl_certificate /etc/certificates/matomo.pem;
     ssl_certificate_key /etc/certificates/matomo.key;
@@ -43,9 +44,13 @@ server {
 
     location / {
         proxy_pass http://matomo:80/;
-        proxy_set_header Host PUT_HOST_HEADER_HERE;
-        proxy_set_header X-Forwarded-Proto https;
-        proxy_set_header Referer $http_referer;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+
         proxy_cache cache;
         proxy_cache_bypass $cookie_auth_tkt;
         proxy_no_cache $cookie_auth_tkt;

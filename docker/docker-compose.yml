@@ -1,11 +1,18 @@
 ---
+
+volumes:
+  matomo_config:
+  matomo_db_data:
+  nginx_config:
+
 services:
   database:
+    container_name: database
     image: mariadb:12
     command: --max-allowed-packet=64MB
     restart: always
     volumes:
-      - database:/var/lib/mysql:Z
+      - matomo_db_data:/var/lib/mysql:Z
     environment:
       - MARIADB_AUTO_UPGRADE=1
       - MARIADB_DATABASE=matomo
@@ -16,12 +23,13 @@ services:
       - MARIADB_USER=matomo
 
   matomo:
-    image: matomo:5.4.0
+    container_name: matomo
+    image: ghcr.io/utrechtuniversity/matomo-app:latest
     restart: always
     depends_on:
       - database
     volumes:
-      - matomo:/var/www/html:z
+      - matomo_config:/var/www/html/matomo/config:z
     environment:
       - MATOMO_DATABASE_ADAPTER=mysql
       - MATOMO_DATABASE_DBNAME=matomo
@@ -29,6 +37,12 @@ services:
       - MATOMO_DATABASE_PASSWORD=${MARIADB_PASSWORD}
       - MATOMO_DATABASE_TABLES_PREFIX=matomo_
       - MATOMO_DATABASE_USERNAME=matomo
+      - MATOMO_HOST=${MATOMO_HOST}
+      - MATOMO_FIRST_SITE_NAME=${MATOMO_FIRST_SITE_NAME}
+      - MATOMO_FIRST_SITE_URL=${MATOMO_FIRST_SITE_URL}
+      - MATOMO_FIRST_USER_NAME=${MATOMO_FIRST_USER_NAME}
+      - MATOMO_FIRST_USER_EMAIL=${MATOMO_FIRST_USER_EMAIL}
+      - MATOMO_FIRST_USER_PASSWORD=${MATOMO_FIRST_USER_PASSWORD}
       - PHP_MEMORY_LIMIT=2048M
 
   nginx:
@@ -64,9 +78,3 @@ services:
       -  POSTFIX_ORIGIN=${POSTFIX_ORIGIN}
     sysctls:
       net.ipv4.ip_unprivileged_port_start: 0
-
-
-volumes:
-  database:
-  matomo:
-  nginx_config:

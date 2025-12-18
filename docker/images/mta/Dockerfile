@@ -23,7 +23,7 @@ RUN dpkg-reconfigure --frontend=noninteractive locales
 RUN update-locale LANG=${LC_ALL}
 
 # Install common dependencies
-RUN apt -y install curl golang git && \
+RUN apt -y install curl golang git iproute2 && \
     curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash && \
     source /root/.nvm/nvm.sh && \
     nvm install v18

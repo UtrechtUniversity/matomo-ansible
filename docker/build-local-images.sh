@@ -3,10 +3,10 @@ set -e
 
 cd images
 
-for image in nginx mta
+for image in nginx mta matomo
 do cd "$image"
    echo "Building image $image ..."
-   ./build.sh
+   ./build.sh $*
    cd ..
 done
 
