@@ -15,7 +15,7 @@ RUN apt-get update
 
 # Install common tools
 # hadolint ignore=DL3033
-RUN apt-get install -y wget git vim sudo nmap crudini
+RUN apt-get install -y wget git vim sudo nmap crudini mariadb-client
 
 ## Install Apache
 # hadolint ignore=DL3033
