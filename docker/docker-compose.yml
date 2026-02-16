@@ -3,6 +3,7 @@
 volumes:
   matomo_config:
   matomo_db_data:
+  matomo_tmp_data:
   nginx_config:
 
 services:
@@ -30,6 +31,7 @@ services:
       - database
     volumes:
       - matomo_config:/var/www/html/matomo/config:z
+      - matomo_tmp_data:/var/www/html/matomo/tmp:Z
     environment:
       - MATOMO_DATABASE_ADAPTER=mysql
       - MATOMO_DATABASE_DBNAME=matomo
