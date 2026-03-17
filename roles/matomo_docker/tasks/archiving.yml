@@ -17,17 +17,6 @@
     mode: "0755"
   when: matomo_archiving_enabled
 
-- name: "Deploy logrotate config"
-  ansible.builtin.template:
-    src: "logrotate-matomo-archive.j2"
-    dest: "/etc/logrotate.d/matomo-archive"
-    owner: root
-    group: root
-    mode: "0644"
-  when:
-    - matomo_archiving_enabled
-    - matomo_archive_logrotate_enabled
-
 - name: "Schedule cron job"
   ansible.builtin.cron:
     name: "Matomo CLI archiving (core:archive)"

@@ -58,10 +58,5 @@ matomo_archive_cron_day: "*"
 matomo_archive_cron_month: "*"
 matomo_archive_cron_weekday: "*"
 
-# Extra args for `core:archive` (use "-vvv" temporarily for debugging)
-matomo_archive_extra_args: "-q"
-
-# Logrotate policy
-matomo_archive_logrotate_enabled: true
-matomo_archive_logrotate_frequency: daily
-matomo_archive_logrotate_rotate: 14
+# Extra args for `core:archive` 
+matomo_archive_extra_args: "-q" # quiet mode, no output unless error
