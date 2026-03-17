@@ -1,4 +1,6 @@
 ---
+# copyright Utrecht University
+
 - name: "Ensure log directory exists"
   ansible.builtin.file:
     path: "{{ matomo_archive_log_dir }}"

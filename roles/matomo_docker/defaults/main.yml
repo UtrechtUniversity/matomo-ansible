@@ -58,5 +58,5 @@ matomo_archive_cron_day: "*"
 matomo_archive_cron_month: "*"
 matomo_archive_cron_weekday: "*"
 
-# Extra args for `core:archive` 
+# Extra args for `core:archive`
 matomo_archive_extra_args: "-q" # quiet mode, no output unless error
