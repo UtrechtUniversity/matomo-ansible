@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CONTAINER="{{ matomo_docker_container_name }}"
+CONSOLE="{{ matomo_console_path }}"
+LOG_FILE="{{ matomo_archive_log_file }}"
+LOCK_FILE="{{ matomo_archive_lock_file }}"
+
+ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
+
+mkdir -p "$(dirname "$LOG_FILE")"
+
+# Prevent overlapping runs
+exec 200>"$LOCK_FILE"
+flock -n 200 || exit 0
+
+echo "[$(ts)] starting core:archive" >> "$LOG_FILE"
+
+if docker exec -t "$CONTAINER" php "$CONSOLE" core:archive {{ matomo_archive_extra_args }} >> "$LOG_FILE" 2>&1; then
+  echo "[$(ts)] finished OK" >> "$LOG_FILE"
+else
+  rc=$?
+  echo "[$(ts)] finished ERROR rc=$rc" >> "$LOG_FILE"
+  exit $rc
+fi

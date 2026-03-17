@@ -1,0 +1,9 @@
+{{ matomo_archive_log_file }} {
+    {{ matomo_archive_logrotate_frequency }}
+    rotate {{ matomo_archive_logrotate_rotate }}
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}
