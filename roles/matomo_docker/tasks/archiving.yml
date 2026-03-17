@@ -21,7 +21,7 @@
 
 - name: "Schedule cron job"
   ansible.builtin.cron:
-    name: "Matomo CLI archiving (core:archive)"
+    name: "Matomo archiving with core:archive"
     user: root
     minute: "{{ matomo_archive_cron_minute }}"
     hour: "{{ matomo_archive_cron_hour }}"
