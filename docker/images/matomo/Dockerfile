@@ -3,7 +3,7 @@ LABEL maintainer="Yoda team <yoda@uu.nl>"
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Application settings
-ENV MATOMO_VERSION="5.6.1"
+ENV MATOMO_VERSION="5.8.0"
 ENV MATOMO_EXTRATOOLS_PLUGIN_VERSION="5.1.5"
 ENV MATOMO_CLASSICCOUNTER_PLUGIN_VERSION="0.4.0"
 
