@@ -52,7 +52,7 @@ then before_update "Setting up Apache vhost"
      cd /var/www/html/matomo
      ./console matomo:install --no-interaction \
 	     --db-username="$MATOMO_DATABASE_USERNAME" \
-	     --db-pass="MATOMO_DATABASE_PASSWORD" \
+	     --db-pass="$MATOMO_DATABASE_PASSWORD" \
              --db-host="$MATOMO_DATABASE_HOST" \
 	     --db-port=3306 \
 	     --db-name="$MATOMO_DATABASE_DBNAME" \
