@@ -13,7 +13,11 @@ mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"
 
 # Prevent overlapping runs
 exec 200>"$LOCK_FILE"
-/bin/flock -n 200 || exit 0
+
+if ! /bin/flock -n 200; then
+  echo "[$(ts)] WARNING: archive lock is held" >> "$LOG_FILE"
+  exit 0
+fi
 
 echo "[$(ts)] starting core:archive" >> "$LOG_FILE"
 
