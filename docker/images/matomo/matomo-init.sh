@@ -60,11 +60,28 @@ then before_update "Setting up Apache vhost"
        --db-adapter="${MATOMO_DATABASE_ADAPTER:-mysqli}" \
        --db-collation=utf8mb4_general_ci \
        --db-charset=utf8mb4 \
-       --first-site-name="$MATOMO_FIRST_SITE_NAME" \
-       --first-site-url="$MATOMO_FIRST_SITE_URL" \
        --first-user="$MATOMO_FIRST_USER_NAME" \
        --first-user-email="$MATOMO_FIRST_USER_EMAIL" \
        --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
+     progress_update "Matomo initialized"
+    
+     # A workaround: CustomDimensions plugin is not compatible with current Matomo version somehow, adding site will fail with error "table custom_dimensions not found".
+     before_update "Deactivating CustomDimensions plugin."
+     sudo -u www-data php console plugin:deactivate CustomDimensions || true
+     progress_update "CustomDimensions plugin deactivated"
+     
+     # A workaround: the MariaDB schema seems to be old. Hence the update
+     before_update "Running Matomo core update."
+     sudo -u www-data php /var/www/html/matomo/console core:update --yes
+     progress_update "Matomo core updated"
+     
+     # Add the site manually, due to ExtraTools bug in https://plugins.matomo.org/ExtraTools?matomoversion=5#documentation
+     before_update "Adding first site."
+     sudo -u www-data php console site:add \
+       --name="$MATOMO_FIRST_SITE_NAME" \
+       --urls="$MATOMO_FIRST_SITE_URL"
+     progress_update "First site added"
+
      crudini --set /var/www/html/matomo/config/config.ini.php General force_ssl 1
      crudini --set /var/www/html/matomo/config/config.ini.php General assume_secure_protocol 1
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_client_headers[] HTTP_X_FORWARDED_FOR
