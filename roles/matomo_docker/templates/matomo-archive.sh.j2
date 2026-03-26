@@ -9,15 +9,15 @@ LOCK_FILE="{{ matomo_archive_lock_file }}"
 
 ts() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
 
-mkdir -p "$(dirname "$LOG_FILE")"
+mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"
 
 # Prevent overlapping runs
 exec 200>"$LOCK_FILE"
-flock -n 200 || exit 0
+/bin/flock -n 200 || exit 0
 
 echo "[$(ts)] starting core:archive" >> "$LOG_FILE"
 
-if docker exec -u "$CRON_USER" "$CONTAINER" php "$CONSOLE" core:archive >> "$LOG_FILE" 2>&1; then
+if /bin/docker exec -u "$CRON_USER" "$CONTAINER" php "$CONSOLE" core:archive >> "$LOG_FILE" 2>&1; then
   echo "[$(ts)] finished OK" >> "$LOG_FILE"
 else
   rc=$?
