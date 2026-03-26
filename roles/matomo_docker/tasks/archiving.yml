@@ -10,7 +10,7 @@
     mode: "0755"
   when: matomo_archiving_enabled
 
-- name: "Deploy matomo-archive script"
+- name: "Deploy matomo-archive script (when enabled)"
   ansible.builtin.template:
     src: "matomo-archive.sh.j2"
     dest: "{{ matomo_archive_script_path }}"
@@ -19,7 +19,13 @@
     mode: "0755"
   when: matomo_archiving_enabled
 
-- name: "Schedule cron job"
+- name: Remove matomo-archive script (when disabled)
+  ansible.builtin.file:
+    path: "{{ matomo_archive_script_path }}"
+    state: absent
+  when: not matomo_archiving_enabled
+  
+- name: Schedule archiving cron job
   ansible.builtin.cron:
     name: "Matomo archiving with core:archive"
     user: root
@@ -29,4 +35,4 @@
     month: "{{ matomo_archive_cron_month }}"
     weekday: "{{ matomo_archive_cron_weekday }}"
     job: "{{ matomo_archive_script_path }}"
-  when: matomo_archiving_enabled
+    state: "{{ 'present' if matomo_archiving_enabled else 'absent' }}"

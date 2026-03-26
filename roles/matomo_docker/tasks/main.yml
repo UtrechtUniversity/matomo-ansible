@@ -87,4 +87,3 @@
 
 - name: "Set up Matomo archiving"
   ansible.builtin.import_tasks: archiving.yml
-  when: matomo_archiving_enabled
