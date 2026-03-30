@@ -83,3 +83,7 @@
     enabled: true
     state: started
     daemon_reload: true
+
+
+- name: "Set up Matomo archiving"
+  ansible.builtin.import_tasks: archiving.yml

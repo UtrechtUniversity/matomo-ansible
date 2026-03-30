@@ -61,6 +61,7 @@ then before_update "Setting up Apache vhost"
              --first-user="$MATOMO_FIRST_USER_NAME" \
              --first-user-email="$MATOMO_FIRST_USER_EMAIL" \
              --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
+     crudini --set /var/www/html/matomo/config/config.ini.php General browser_archiving_disabled_enforce 1
      crudini --set /var/www/html/matomo/config/config.ini.php General force_ssl 1
      crudini --set /var/www/html/matomo/config/config.ini.php General assume_secure_protocol 1
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_client_headers[] HTTP_X_FORWARDED_FOR
