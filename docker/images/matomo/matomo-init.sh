@@ -74,12 +74,7 @@ then before_update "Setting up Apache vhost"
      before_update "Deactivating CustomDimensions plugin."
      sudo -u www-data php console plugin:deactivate CustomDimensions || true
      progress_update "CustomDimensions plugin deactivated"
-     
-     # A workaround: the MariaDB schema seems to be old. Hence the update
-     before_update "Running Matomo core update."
-     sudo -u www-data php /var/www/html/matomo/console core:update --yes
-     progress_update "Matomo core updated"
-     
+
      # Add the site manually, due to ExtraTools bug in https://plugins.matomo.org/ExtraTools?matomoversion=5#documentation
      before_update "Adding first site."
      sudo -u www-data php console site:add \
