@@ -68,8 +68,9 @@ then before_update "Setting up Apache vhost"
        --first-user-email="$MATOMO_FIRST_USER_EMAIL" \
        --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
      progress_update "Matomo initialized"
-    
-     # A workaround: CustomDimensions plugin is not compatible with current Matomo version somehow, adding site will fail with error "table custom_dimensions not found".
+
+     # A workaround: CustomDimensions plugin is not compatible with current Matomo version somehow, adding site will
+     # fail with error table custom_dimensions not found.
      before_update "Deactivating CustomDimensions plugin."
      sudo -u www-data php console plugin:deactivate CustomDimensions || true
      progress_update "CustomDimensions plugin deactivated"
