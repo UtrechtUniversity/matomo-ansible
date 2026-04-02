@@ -4,6 +4,8 @@ set -o pipefail
 set -u
 
 INITIALIZATION_FLAG_FILE="/var/www/html/matomo/config/.matomo-initialized"
+MATOMO_DB_COLLATION="utf8mb4_uca1400_ai_ci"
+MATOMO_DB_CHARSET="utf8mb4"
 
 function start_service {
   apache2ctl -D FOREGROUND || true
@@ -60,8 +62,8 @@ then before_update "Setting up Apache vhost"
        --db-name="$MATOMO_DATABASE_DBNAME" \
        --db-prefix="${MATOMO_DATABASE_TABLES_PREFIX:-matomo_}" \
        --db-adapter="${MATOMO_DATABASE_ADAPTER:-mysqli}" \
-       --db-collation=utf8mb4_general_ci \
-       --db-charset=utf8mb4 \
+       --db-collation=${MATOMO_DB_COLLATION} \
+       --db-charset=${MATOMO_DB_CHARSET}  \
        --first-user="$MATOMO_FIRST_USER_NAME" \
        --first-user-email="$MATOMO_FIRST_USER_EMAIL" \
        --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
@@ -88,8 +90,12 @@ then before_update "Setting up Apache vhost"
      crudini --set /var/www/html/matomo/config/config.ini.php General assume_secure_protocol 1
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_client_headers[] HTTP_X_FORWARDED_FOR
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_host_headers[] HTTP_X_FORWARDED_HOST
+     crudini --set /var/www/html/matomo/config/config.ini.php database collation ${MATOMO_DB_COLLATION}
+     crudini --set /var/www/html/matomo/config/config.ini.php database schema MariaDB
+     crudini --set /var/www/html/matomo/config/config.ini.php database charset ${MATOMO_DB_CHARSET}
      chmod 0644 /var/www/html/matomo/config/config.ini.php
      chown www-data:www-data /var/www/html/matomo/config/config.ini.php
+
      touch "$INITIALIZATION_FLAG_FILE"
 fi
 
