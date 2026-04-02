@@ -82,6 +82,12 @@ then before_update "Setting up Apache vhost"
        --urls="$MATOMO_FIRST_SITE_URL"
      progress_update "First site added"
 
+     # Dummy command to trigger creation of missing tables after site:add
+     # See https://github.com/Digitalist-Open-Cloud/Matomo-Plugin-ExtraTools/issues/44 for context
+     before_update "Triggering table creation by querying visits for non-existent site."
+     sudo -u www-data php console visits:get -i 999 || true
+     progress_update "Triggered table creation by querying visits for non-existent site."
+
      crudini --set /var/www/html/matomo/config/config.ini.php General force_ssl 1
      crudini --set /var/www/html/matomo/config/config.ini.php General assume_secure_protocol 1
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_client_headers[] HTTP_X_FORWARDED_FOR
