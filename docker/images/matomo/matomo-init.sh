@@ -60,20 +60,14 @@ then before_update "Setting up Apache vhost"
        --db-host="$MATOMO_DATABASE_HOST" \
        --db-port=3306 \
        --db-name="$MATOMO_DATABASE_DBNAME" \
-       --db-prefix="${MATOMO_DATABASE_TABLES_PREFIX:-matomo_}" \
-       --db-adapter="${MATOMO_DATABASE_ADAPTER:-mysqli}" \
-       --db-collation=${MATOMO_DB_COLLATION} \
-       --db-charset=${MATOMO_DB_CHARSET}  \
+       --db-prefix="$MATOMO_DATABASE_TABLES_PREFIX" \
+       --db-adapter="$MATOMO_DATABASE_ADAPTER" \
+       --db-collation=$MATOMO_DB_COLLATION \
+       --db-charset=$MATOMO_DB_CHARSET  \
        --first-user="$MATOMO_FIRST_USER_NAME" \
        --first-user-email="$MATOMO_FIRST_USER_EMAIL" \
        --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
      progress_update "Matomo initialized"
-
-     # A workaround: CustomDimensions plugin is not compatible with current Matomo version somehow, adding site will
-     # fail with error table custom_dimensions not found.
-     before_update "Deactivating CustomDimensions plugin."
-     sudo -u www-data php console plugin:deactivate CustomDimensions || true
-     progress_update "CustomDimensions plugin deactivated"
 
      # Add the site manually, due to ExtraTools bug in https://plugins.matomo.org/ExtraTools?matomoversion=5#documentation
      before_update "Adding first site."
