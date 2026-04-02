@@ -3,6 +3,8 @@
 set -o pipefail
 set -u
 
+INITIALIZATION_FLAG_FILE="/var/www/html/matomo/config/.matomo-initialized"
+
 function start_service {
   apache2ctl -D FOREGROUND || true
   echo "Error: Apache either terminated or would not start. Keeping container running for troubleshooting purposes."
@@ -45,7 +47,7 @@ check_port database 3306
 
 set -e
 
-if ! [[ -f /container_initialized ]]
+if ! [[ -f "$INITIALIZATION_FLAG_FILE" ]]
 then before_update "Setting up Apache vhost"
      perl -pi -e '$servername=$ENV{MATOMO_HOST}; s/SERVERNAME/$servername/' /etc/apache2/sites-available/001-matomo.conf
      before_update "Initializing Matomo."
@@ -88,7 +90,7 @@ then before_update "Setting up Apache vhost"
      crudini --set /var/www/html/matomo/config/config.ini.php General proxy_host_headers[] HTTP_X_FORWARDED_HOST
      chmod 0644 /var/www/html/matomo/config/config.ini.php
      chown www-data:www-data /var/www/html/matomo/config/config.ini.php
-     touch /container_initialized
+     touch "$INITIALIZATION_FLAG_FILE"
 fi
 
 before_update "Initialization complete. Starting Apache"
