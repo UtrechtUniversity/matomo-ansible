@@ -33,7 +33,7 @@ services:
       - matomo_config:/var/www/html/matomo/config:z
       - matomo_tmp_data:/var/www/html/matomo/tmp:Z
     environment:
-      - MATOMO_DATABASE_ADAPTER=mysql
+      - MATOMO_DATABASE_ADAPTER=mysqli
       - MATOMO_DATABASE_DBNAME=matomo
       - MATOMO_DATABASE_HOST=database
       - MATOMO_DATABASE_PASSWORD=${MARIADB_PASSWORD}
