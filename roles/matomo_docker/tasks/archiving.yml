@@ -1,0 +1,47 @@
+---
+# copyright Utrecht University
+
+- name: "Ensure log directory exists"
+  ansible.builtin.file:
+    path: "{{ matomo_archive_log_dir }}"
+    state: directory
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: "0755"
+  when: matomo_archiving_enabled
+
+- name: Ensure matomo-archive directory exists
+  ansible.builtin.file:
+    path: "{{ matomo_archive_script_path | dirname }}"
+    state: directory
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: "0755"
+  when: matomo_archiving_enabled
+
+- name: "Deploy matomo-archive script (when enabled)"
+  ansible.builtin.template:
+    src: "matomo-archive.sh.j2"
+    dest: "{{ matomo_archive_script_path }}"
+    owner: "{{ matomo_user }}"
+    group: "{{ matomo_user }}"
+    mode: "0755"
+  when: matomo_archiving_enabled
+
+- name: Remove matomo-archive script (when disabled)
+  ansible.builtin.file:
+    path: "{{ matomo_archive_script_path }}"
+    state: absent
+  when: not matomo_archiving_enabled
+
+- name: Schedule archiving cron job
+  ansible.builtin.cron:
+    name: "Matomo archiving with core:archive"
+    user: "{{ matomo_user }}"
+    minute: "{{ matomo_archive_cron_minute }}"
+    hour: "{{ matomo_archive_cron_hour }}"
+    day: "{{ matomo_archive_cron_day }}"
+    month: "{{ matomo_archive_cron_month }}"
+    weekday: "{{ matomo_archive_cron_weekday }}"
+    job: "{{ matomo_archive_script_path }}"
+    state: "{{ 'present' if matomo_archiving_enabled else 'absent' }}"

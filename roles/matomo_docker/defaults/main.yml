@@ -34,3 +34,21 @@ matomo_mail_from_address: matomo@changeme.nl
 matomo_cert_mode: selfsigned
 matomo_static_cert: notset
 matomo_static_cert_key: notset
+
+# Archiving configuration
+matomo_archiving_enabled: true
+matomo_container_name: matomo
+matomo_container_user: www-data
+matomo_console_path: /var/www/html/matomo/console
+
+matomo_archive_script_path: /home/{{ matomo_user }}/matomo-archive/matomo-archive.sh
+matomo_archive_log_dir: "/home/{{ matomo_user }}/log"
+matomo_archive_log_file: "{{ matomo_archive_log_dir }}/archive.log"
+matomo_archive_lock_file: "/home/{{ matomo_user }}/matomo-archive/archive.lock"
+
+# Archiving cron schedule (default: hourly at minute 5)
+matomo_archive_cron_minute: "5"
+matomo_archive_cron_hour: "*"
+matomo_archive_cron_day: "*"
+matomo_archive_cron_month: "*"
+matomo_archive_cron_weekday: "*"
