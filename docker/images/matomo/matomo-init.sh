@@ -70,6 +70,11 @@ then before_update "Setting up Apache vhost"
        --first-user-pass="$MATOMO_FIRST_USER_PASSWORD"
      progress_update "Matomo initialized"
 
+     # Run a core update to ensure that all plugin tables have been loaded.
+     before_update "Running core update to initialize plugin tables"
+     sudo -u www-data php console core:update
+     progress_update "Core update finished"
+
      # Add the site manually, due to ExtraTools bug in https://plugins.matomo.org/ExtraTools?matomoversion=5#documentation
      before_update "Adding first site."
      sudo -u www-data php console site:add \
