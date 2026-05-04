@@ -13,6 +13,7 @@ matomo_first_site_url: https://yoda.uu.nl
 matomo_first_user_name: admin
 matomo_first_user_email: yoda@uu.nl
 matomo_first_user_password: adminadmin
+matomo_cors_domains: https://yoda.uu.nl
 
 matomo_mysql_password: testtest
 matomo_mysql_root_password: testtest

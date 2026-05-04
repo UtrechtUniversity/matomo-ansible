@@ -6,6 +6,7 @@ set -u
 INITIALIZATION_FLAG_FILE="/var/www/html/matomo/config/.matomo-initialized"
 MATOMO_DB_COLLATION="utf8mb4_uca1400_ai_ci"
 MATOMO_DB_CHARSET="utf8mb4"
+CONFIGFILE="/var/www/html/matomo/config/config.ini.php"
 
 function start_service {
   apache2ctl -D FOREGROUND || true
@@ -81,17 +82,33 @@ then before_update "Setting up Apache vhost"
      before_update "Triggering table creation by querying visits for non-existent site."
      sudo -u www-data php console visits:get -i 999 || true
      progress_update "Triggered table creation by querying visits for non-existent site."
+
+     crudini --set "$CONFIGFILE" General browser_archiving_disabled_enforce 1
+     crudini --set "$CONFIGFILE" General force_ssl 1
+     crudini --set "$CONFIGFILE" General assume_secure_protocol 1
+     crudini --set "$CONFIGFILE" General proxy_client_headers[] HTTP_X_FORWARDED_FOR
+     crudini --set "$CONFIGFILE" General proxy_host_headers[] HTTP_X_FORWARDED_HOST
+     crudini --set "$CONFIGFILE" database collation "${MATOMO_DB_COLLATION}"
+     crudini --set "$CONFIGFILE" database schema MariaDB
+     crudini --set "$CONFIGFILE" database charset "${MATOMO_DB_CHARSET}"
+
+     IFS=';' read -ra DOMAIN <<< "$MATOMO_CORS_DOMAINS"
+     for domain in "${DOMAIN[@]}"
+     do # Use AWK rather than Crudini in order to be able to handle multiple
+	# values with same key and section.
+	awk -v line="cors_domains[] = \"$domain\"\n" '
+        /^\[General\]/ && !done {
+            print
+            printf "%s", line
+            done=1
+            next
+        }
+        { print }
+    ' "$CONFIGFILE" > "${CONFIGFILE}.tmp" && mv "${CONFIGFILE}.tmp" "$CONFIGFILE"
+     done
  
-     crudini --set /var/www/html/matomo/config/config.ini.php General browser_archiving_disabled_enforce 1
-     crudini --set /var/www/html/matomo/config/config.ini.php General force_ssl 1
-     crudini --set /var/www/html/matomo/config/config.ini.php General assume_secure_protocol 1
-     crudini --set /var/www/html/matomo/config/config.ini.php General proxy_client_headers[] HTTP_X_FORWARDED_FOR
-     crudini --set /var/www/html/matomo/config/config.ini.php General proxy_host_headers[] HTTP_X_FORWARDED_HOST
-     crudini --set /var/www/html/matomo/config/config.ini.php database collation ${MATOMO_DB_COLLATION}
-     crudini --set /var/www/html/matomo/config/config.ini.php database schema MariaDB
-     crudini --set /var/www/html/matomo/config/config.ini.php database charset ${MATOMO_DB_CHARSET}
-     chmod 0644 /var/www/html/matomo/config/config.ini.php
-     chown www-data:www-data /var/www/html/matomo/config/config.ini.php
+     chmod 0644 "$CONFIGFILE"
+     chown www-data:www-data "$CONFIGFILE"
 
      touch "$INITIALIZATION_FLAG_FILE"
 fi
