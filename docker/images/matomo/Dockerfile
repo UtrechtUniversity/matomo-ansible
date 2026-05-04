@@ -5,7 +5,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Application settings
 ENV MATOMO_VERSION="5.8.0"
 ENV MATOMO_EXTRATOOLS_PLUGIN_VERSION="5.1.5"
-ENV MATOMO_CLASSICCOUNTER_PLUGIN_VERSION="0.4.0"
+ENV MATOMO_PAGEVIEWCOUNTER_PLUGIN_VERSION="v0.0.1"
 
 # Network settings
 EXPOSE 80
@@ -39,7 +39,7 @@ RUN cd /tmp && \
 ## Install Matomo plugins
 RUN cd /var/www/html/matomo/plugins && \
     git clone --branch "$MATOMO_EXTRATOOLS_PLUGIN_VERSION" https://github.com/Digitalist-Open-Cloud/Matomo-Plugin-ExtraTools.git ExtraTools && \
-    git clone --branch "$MATOMO_CLASSICCOUNTER_PLUGIN_VERSION" https://github.com/Findus23/plugin-ClassicCounter.git Counter && \
+    git clone --branch "$MATOMO_PAGEVIEWCOUNTER_PLUGIN_VERSION" https://github.com/UtrechtUniversity/matomo-plugin-pageviewcounter.git PageViewCounter && \
     echo "[General]" > /var/www/html/matomo/config/common.config.ini.php && \
     echo "always_load_commands_from_plugin=ExtraTools" >> /var/www/html/matomo/config/common.config.ini.php && \
     chown -R www-data:www-data /var/www/html/matomo &&\
