@@ -1,5 +1,10 @@
 # matomo-ansible
-Ansible playbook and Docker Compose setup for Matomo web statistics
+
+This Ansible playbook and Docker Compose setup can be used to deploy
+[Matomo](https://matomo.org), an open source web analytics application. The setup also
+includes the [Page View Counter Plugin](https://github.com/UtrechtUniversity/matomo-plugin-pageviewcounter),
+which makes it possible to add a visit counter to pages on a site
+tracked by Matomo.
 
 # Requirements
 
