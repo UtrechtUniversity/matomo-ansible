@@ -25,7 +25,7 @@ jobs:
       id: extract_branch
 
     - name: Check out Matomo Ansible repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         path: matomo-ansible
         repository: UtrechtUniversity/matomo-ansible
