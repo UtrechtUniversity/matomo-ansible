@@ -27,7 +27,14 @@ RUN a2dissite 000-default.conf && \
     a2ensite 001-matomo.conf
 
 ## Install PHP dependencies
-RUN sudo apt-get install -y php php-curl php-gd php-cli php-mysql php-xml php-mbstring
+RUN apt-get satisfy -y --no-install-recommends \
+      "php8.3 (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-cli (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-curl (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-gd (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-mbstring (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-mysql (>= 8.3.6-0ubuntu0.24.04.13)" \
+      "php8.3-xml (>= 8.3.6-0ubuntu0.24.04.13)"
 
 ## Install Matomo
 RUN cd /tmp && \
