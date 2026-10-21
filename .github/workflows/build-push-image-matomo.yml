@@ -1,5 +1,5 @@
 ---
-name: "Build Nginx image and push it to registry"
+name: "Build Matomo image and push it to registry"
 
 on:
   push:
